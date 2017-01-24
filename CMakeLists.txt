@@ -1,7 +1,14 @@
 cmake_minimum_required (VERSION 3.5)
-project (Tetris)
-add_executable (Tetris src/main.cpp)
-add_executable (Test test/catch.cpp)
+project (Tetris CXX)
+add_executable (Tetris src/main.cpp
+                       src/state.cpp)
+add_executable (Test test/catch.cpp
+                     src/state.cpp
+                     test/state.cpp)
+target_compile_features (Tetris PRIVATE cxx_range_for
+                                        cxx_strong_enums)
+target_compile_features (Test PRIVATE cxx_range_for
+                                      cxx_strong_enums)
 
 include (ExternalProject)
 find_package (Git REQUIRED)
