@@ -1,36 +1,75 @@
 #include "state.h"
 
 GameState new_game(int width, int height) {
-  GameState state;
-
-  state.field.height = height;
-  state.field.width = width;
-  state.field.lines.resize(height);
-  for (Line& line : state.field.lines) {
-    line.resize(width);
-    for (CellState& cell : line) {
-      cell = CellState::EMPTY;
-    }
-  }
-
-  state.active_block.position_x = width / 2;
-  state.active_block.position_y = height - 1;
-  state.active_block.tetrimino = Tetrimino::TETRIMINO_O;
-  state.active_block.rotation = Rotation::UNROTATED;
-
-  state.next_block = Tetrimino::TETRIMINO_T;
-
-  state.milliseconds_per_turn = 1000;
-  state.score = 0;
-  state.lines = 0;
+  GameState state = {
+    {
+      height,
+      width,
+      std::vector<std::vector<CellState>>(height, std::vector<CellState>(width, CellState::EMPTY))
+    },
+    {
+      width / 2,
+      height - 1,
+      Tetrimino::TETRIMINO_O,
+      Rotation::UNROTATED
+    },
+    Tetrimino::TETRIMINO_T,
+    1000,
+    0,
+    0
+  };
 
   return state;
+}
+
+bool is_legal_position(Field field, ActiveBlock active_block) {
+  Shape shape = get_shape(active_block.tetrimino, active_block.rotation);
+  for (int shape_y = 0; shape_y < 3; shape_y++) {
+    for (int shape_x = 0; shape_x < 3; shape_x++) {
+      if (shape[shape_y][shape_x] == CellState::FILLED) {
+        int field_x = active_block.position_x + shape_x;
+        int field_y = active_block.position_y - shape_y; // start at top of shape and work down
+        if (field_x < 0 || field_x >= field.width ||
+            field_y < 0 || field_y >= field.height) {
+          return false; // out of bounds
+        }
+        if (field.lines[field_y][field_x] == CellState::FILLED) {
+          return false; // overlapping
+        }
+      }
+    }
+  }
+  return true;
+}
+
+GameState move_left(GameState old_state) {
+  GameState new_state = {
+    old_state.field,
+    {
+      old_state.active_block.position_x - 1,
+      old_state.active_block.position_y,
+      old_state.active_block.tetrimino,
+      old_state.active_block.rotation
+    },
+    old_state.next_block,
+    old_state.milliseconds_per_turn,
+    old_state.score,
+    old_state.lines
+  };
+
+  if (is_legal_position(new_state.field, new_state.active_block)) {
+    return new_state;
+  } else {
+    return old_state;
+  }
 }
 
 GameState reduce(GameState state, Action action) {
   switch(action) {
     case Action::NEW_GAME:
       return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    case Action::MOVE_LEFT:
+      return move_left(state);
     default:
       return state;
   }

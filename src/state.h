@@ -30,6 +30,9 @@ enum class Rotation {
   COUNTERCLOCKWISE
 };
 
+typedef std::vector<std::vector<CellState>> Shape;
+Shape get_shape(Tetrimino tetrimino, Rotation rotation);
+
 typedef std::vector<CellState> Line;
 
 struct Field {
@@ -42,8 +45,8 @@ const int DEFAULT_WIDTH = 10;
 const int DEFAULT_HEIGHT = 20;
 
 struct ActiveBlock {
-  int position_x;
-  int position_y;
+  int position_x; // position of left edge of block
+  int position_y; // position of top edge of block
   Tetrimino tetrimino;
   Rotation rotation;
 };
