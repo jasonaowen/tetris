@@ -2,6 +2,14 @@
 
 #include "../src/state.h"
 
+void check_identical_except_active_block(GameState lhs, GameState rhs) {
+  CHECK(lhs.field == rhs.field);
+  CHECK(lhs.next_block == rhs.next_block);
+  CHECK(lhs.milliseconds_per_turn == rhs.milliseconds_per_turn);
+  CHECK(lhs.score == rhs.score);
+  CHECK(lhs.lines == rhs.lines);
+}
+
 TEST_CASE("Can create new game", "[reducer]") {
   GameState state;
   state = reduce(state, Action::NEW_GAME);
@@ -20,12 +28,8 @@ TEST_CASE("Can move left", "[reducer]") {
   GameState new_game, moved_left;
   new_game = reduce(new_game, Action::NEW_GAME);
   moved_left = reduce(new_game, Action::MOVE_LEFT);
-  CHECK(moved_left.field == new_game.field);
-  CHECK(moved_left.next_block == new_game.next_block);
-  CHECK(moved_left.milliseconds_per_turn == new_game.milliseconds_per_turn);
-  CHECK(moved_left.score == new_game.score);
-  CHECK(moved_left.lines == new_game.lines);
 
+  check_identical_except_active_block(moved_left, new_game);
   CHECK(moved_left.active_block.position_x ==
         new_game.active_block.position_x - 1);
 }
@@ -104,11 +108,7 @@ TEST_CASE("Can move left fitting around previously dropped block", "[reducer]") 
 
   GameState moved_left = reduce(state, Action::MOVE_LEFT);
 
-  CHECK(moved_left.field == state.field);
-  CHECK(moved_left.next_block == state.next_block);
-  CHECK(moved_left.milliseconds_per_turn == state.milliseconds_per_turn);
-  CHECK(moved_left.score == state.score);
-  CHECK(moved_left.lines == state.lines);
+  check_identical_except_active_block(moved_left, state);
   CHECK(moved_left.active_block.position_x ==
         state.active_block.position_x - 1);
 }
@@ -116,13 +116,10 @@ TEST_CASE("Can move left fitting around previously dropped block", "[reducer]") 
 TEST_CASE("Can move right", "[reducer]") {
   GameState new_game, moved_right;
   new_game = reduce(new_game, Action::NEW_GAME);
-  moved_right = reduce(new_game, Action::MOVE_RIGHT);
-  CHECK(moved_right.field == new_game.field);
-  CHECK(moved_right.next_block == new_game.next_block);
-  CHECK(moved_right.milliseconds_per_turn == new_game.milliseconds_per_turn);
-  CHECK(moved_right.score == new_game.score);
-  CHECK(moved_right.lines == new_game.lines);
 
+  moved_right = reduce(new_game, Action::MOVE_RIGHT);
+
+  check_identical_except_active_block(moved_right, new_game);
   CHECK(moved_right.active_block.position_x ==
         new_game.active_block.position_x + 1);
 }
@@ -201,11 +198,7 @@ TEST_CASE("Can move right fitting around previously dropped block", "[reducer]")
 
   GameState moved_right = reduce(state, Action::MOVE_RIGHT);
 
-  CHECK(moved_right.field == state.field);
-  CHECK(moved_right.next_block == state.next_block);
-  CHECK(moved_right.milliseconds_per_turn == state.milliseconds_per_turn);
-  CHECK(moved_right.score == state.score);
-  CHECK(moved_right.lines == state.lines);
+  check_identical_except_active_block(moved_right, state);
   CHECK(moved_right.active_block.position_x ==
         state.active_block.position_x + 1);
 }
