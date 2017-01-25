@@ -42,26 +42,39 @@ bool is_legal_position(Field field, ActiveBlock active_block) {
   return true;
 }
 
-GameState move_left(GameState old_state) {
+GameState update_active_block_if_legal(GameState state, ActiveBlock active_block) {
   GameState new_state = {
-    old_state.field,
-    {
-      old_state.active_block.position_x - 1,
-      old_state.active_block.position_y,
-      old_state.active_block.tetrimino,
-      old_state.active_block.rotation
-    },
-    old_state.next_block,
-    old_state.milliseconds_per_turn,
-    old_state.score,
-    old_state.lines
+    state.field,
+    active_block,
+    state.next_block,
+    state.milliseconds_per_turn,
+    state.score,
+    state.lines
   };
 
   if (is_legal_position(new_state.field, new_state.active_block)) {
     return new_state;
   } else {
-    return old_state;
+    return state;
   }
+}
+
+GameState move_left(GameState old_state) {
+  return update_active_block_if_legal(old_state, {
+    old_state.active_block.position_x - 1,
+    old_state.active_block.position_y,
+    old_state.active_block.tetrimino,
+    old_state.active_block.rotation
+  });
+}
+
+GameState move_right(GameState old_state) {
+  return update_active_block_if_legal(old_state, {
+    old_state.active_block.position_x + 1,
+    old_state.active_block.position_y,
+    old_state.active_block.tetrimino,
+    old_state.active_block.rotation
+  });
 }
 
 GameState reduce(GameState state, Action action) {
@@ -70,6 +83,8 @@ GameState reduce(GameState state, Action action) {
       return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     case Action::MOVE_LEFT:
       return move_left(state);
+    case Action::MOVE_RIGHT:
+      return move_right(state);
     default:
       return state;
   }
