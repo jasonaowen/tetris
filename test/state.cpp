@@ -10,6 +10,22 @@ void check_identical_except_active_block(GameState lhs, GameState rhs) {
   CHECK(lhs.lines == rhs.lines);
 }
 
+GameState default_game_with_active_block(ActiveBlock active_block) {
+  return {
+    {
+      DEFAULT_HEIGHT,
+      DEFAULT_WIDTH,
+      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
+          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
+    },
+    active_block,
+    Tetrimino::TETRIMINO_T,
+    1000,
+    0,
+    0
+  };
+}
+
 TEST_CASE("Can create new game", "[reducer]") {
   GameState state;
   state = reduce(state, Action::NEW_GAME);
@@ -35,24 +51,12 @@ TEST_CASE("Can move left", "[reducer]") {
 }
 
 TEST_CASE("Cannot move left when against left wall", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      0,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_O,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
+  GameState state = default_game_with_active_block({
     0,
-    0
-  };
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_O,
+    Rotation::UNROTATED
+  });
 
   GameState moved_left = reduce(state, Action::MOVE_LEFT);
 
@@ -60,24 +64,12 @@ TEST_CASE("Cannot move left when against left wall", "[reducer]") {
 }
 
 TEST_CASE("Cannot move left when against previously dropped block", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      1,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_O,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
-    0,
-    0
-  };
+  GameState state = default_game_with_active_block({
+    1,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_O,
+    Rotation::UNROTATED
+  });
   state.field.lines[DEFAULT_HEIGHT - 1][0] = CellState::FILLED;
 
   GameState moved_left = reduce(state, Action::MOVE_LEFT);
@@ -86,24 +78,12 @@ TEST_CASE("Cannot move left when against previously dropped block", "[reducer]")
 }
 
 TEST_CASE("Can move left fitting around previously dropped block", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      1,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_S,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
-    0,
-    0
-  };
+  GameState state = default_game_with_active_block({
+    1,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_S,
+    Rotation::UNROTATED
+  });
   state.field.lines[DEFAULT_HEIGHT - 1][0] = CellState::FILLED;
 
   GameState moved_left = reduce(state, Action::MOVE_LEFT);
@@ -125,24 +105,12 @@ TEST_CASE("Can move right", "[reducer]") {
 }
 
 TEST_CASE("Cannot move right when against right wall", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      DEFAULT_WIDTH - 2,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_O,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
-    0,
-    0
-  };
+  GameState state = default_game_with_active_block({
+    DEFAULT_WIDTH - 2,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_O,
+    Rotation::UNROTATED
+  });
 
   GameState moved_right = reduce(state, Action::MOVE_RIGHT);
 
@@ -150,24 +118,12 @@ TEST_CASE("Cannot move right when against right wall", "[reducer]") {
 }
 
 TEST_CASE("Cannot move right when against previously dropped block", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      DEFAULT_WIDTH-3,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_O,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
-    0,
-    0
-  };
+  GameState state = default_game_with_active_block({
+    DEFAULT_WIDTH - 3,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_O,
+    Rotation::UNROTATED
+  });
   state.field.lines[DEFAULT_HEIGHT - 1][DEFAULT_WIDTH - 1] = CellState::FILLED;
 
   GameState moved_right = reduce(state, Action::MOVE_RIGHT);
@@ -176,24 +132,12 @@ TEST_CASE("Cannot move right when against previously dropped block", "[reducer]"
 }
 
 TEST_CASE("Can move right fitting around previously dropped block", "[reducer]") {
-  GameState state = {
-    {
-      DEFAULT_HEIGHT,
-      DEFAULT_WIDTH,
-      std::vector<std::vector<CellState>>(DEFAULT_HEIGHT,
-          std::vector<CellState>(DEFAULT_WIDTH, CellState::EMPTY))
-    },
-    {
-      DEFAULT_WIDTH - 4,
-      DEFAULT_HEIGHT - 1,
-      Tetrimino::TETRIMINO_Z,
-      Rotation::UNROTATED
-    },
-    Tetrimino::TETRIMINO_T,
-    1000,
-    0,
-    0
-  };
+  GameState state = default_game_with_active_block({
+    DEFAULT_WIDTH - 4,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_Z,
+    Rotation::UNROTATED
+  });
   state.field.lines[DEFAULT_HEIGHT - 1][DEFAULT_WIDTH - 1] = CellState::FILLED;
 
   GameState moved_right = reduce(state, Action::MOVE_RIGHT);
