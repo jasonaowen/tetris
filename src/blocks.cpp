@@ -1,7 +1,7 @@
 #include "state.h"
 
 const char* blocks[] = {
-  // TETRIMINO_I
+  // I
   "****"
   "    "
   "    "
@@ -19,7 +19,7 @@ const char* blocks[] = {
   "*   "
   "*   ",
 
-  // TETRIMINO_J
+  // J
   "*** "
   "  * "
   "    "
@@ -37,7 +37,7 @@ const char* blocks[] = {
   "*   "
   "    ",
 
-  // TETRIMINO_L
+  // L
   "*** "
   "*   "
   "    "
@@ -55,7 +55,7 @@ const char* blocks[] = {
   "**  "
   "    ",
 
-  // TETRIMINO_O
+  // O
   "**  "
   "**  "
   "    "
@@ -72,7 +72,7 @@ const char* blocks[] = {
   "**  "
   "    "
   "    ",
-  // TETRIMINO_S
+  // S
   " ** "
   "**  "
   "    "
@@ -90,7 +90,7 @@ const char* blocks[] = {
   " *  "
   "    ",
 
-  // TETRIMINO_T
+  // T
   "*** "
   " *  "
   "    "
@@ -108,7 +108,7 @@ const char* blocks[] = {
   "*   "
   "    ",
 
-  // TETRIMINO_Z
+  // Z
   "**  "
   " ** "
   "    "
@@ -127,8 +127,8 @@ const char* blocks[] = {
   "    ",
 };
 
-Shape parse_block(Tetrimino tetrimino, Rotation rotation) {
-  int index = static_cast<int>(tetrimino) * 4 + static_cast<int>(rotation);
+Shape parse_block(Tetromino tetromino, Rotation rotation) {
+  int index = static_cast<int>(tetromino) * 4 + static_cast<int>(rotation);
   const char* block = blocks[index];
   std::vector<std::vector<CellState>> shape = {
     {CellState::EMPTY, CellState::EMPTY, CellState::EMPTY, CellState::EMPTY},
@@ -148,37 +148,37 @@ Shape parse_block(Tetrimino tetrimino, Rotation rotation) {
 }
 
 std::vector<Shape> shapes = {
-  parse_block(Tetrimino::TETRIMINO_I, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_I, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_I, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_I, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_J, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_J, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_J, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_J, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_L, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_L, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_L, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_L, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_O, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_O, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_O, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_O, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_S, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_S, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_S, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_S, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_T, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_T, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_T, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_T, Rotation::COUNTERCLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_Z, Rotation::UNROTATED),
-  parse_block(Tetrimino::TETRIMINO_Z, Rotation::CLOCKWISE),
-  parse_block(Tetrimino::TETRIMINO_Z, Rotation::UPSIDE_DOWN),
-  parse_block(Tetrimino::TETRIMINO_Z, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::I, Rotation::UNROTATED),
+  parse_block(Tetromino::I, Rotation::CLOCKWISE),
+  parse_block(Tetromino::I, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::I, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::J, Rotation::UNROTATED),
+  parse_block(Tetromino::J, Rotation::CLOCKWISE),
+  parse_block(Tetromino::J, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::J, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::L, Rotation::UNROTATED),
+  parse_block(Tetromino::L, Rotation::CLOCKWISE),
+  parse_block(Tetromino::L, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::L, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::O, Rotation::UNROTATED),
+  parse_block(Tetromino::O, Rotation::CLOCKWISE),
+  parse_block(Tetromino::O, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::O, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::S, Rotation::UNROTATED),
+  parse_block(Tetromino::S, Rotation::CLOCKWISE),
+  parse_block(Tetromino::S, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::S, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::T, Rotation::UNROTATED),
+  parse_block(Tetromino::T, Rotation::CLOCKWISE),
+  parse_block(Tetromino::T, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::T, Rotation::COUNTERCLOCKWISE),
+  parse_block(Tetromino::Z, Rotation::UNROTATED),
+  parse_block(Tetromino::Z, Rotation::CLOCKWISE),
+  parse_block(Tetromino::Z, Rotation::UPSIDE_DOWN),
+  parse_block(Tetromino::Z, Rotation::COUNTERCLOCKWISE),
 };
 
-Shape get_shape(Tetrimino tetrimino, Rotation rotation) {
-  int index = static_cast<int>(tetrimino) * 4 + static_cast<int>(rotation);
+Shape get_shape(Tetromino tetromino, Rotation rotation) {
+  int index = static_cast<int>(tetromino) * 4 + static_cast<int>(rotation);
   return shapes[index];
 }

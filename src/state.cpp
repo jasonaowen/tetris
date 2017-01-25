@@ -28,10 +28,10 @@ GameState new_game(int width, int height) {
     {
       width / 2,
       height - 1,
-      Tetrimino::TETRIMINO_O,
+      Tetromino::O,
       Rotation::UNROTATED
     },
-    Tetrimino::TETRIMINO_T,
+    Tetromino::T,
     1000,
     0,
     0
@@ -41,7 +41,7 @@ GameState new_game(int width, int height) {
 }
 
 bool is_legal_position(Field field, ActiveBlock active_block) {
-  Shape shape = get_shape(active_block.tetrimino, active_block.rotation);
+  Shape shape = get_shape(active_block.tetromino, active_block.rotation);
   for (int shape_y = 0; shape_y < 3; shape_y++) {
     for (int shape_x = 0; shape_x < 3; shape_x++) {
       if (shape[shape_y][shape_x] == CellState::FILLED) {
@@ -81,7 +81,7 @@ GameState move_left(GameState old_state) {
   return update_active_block_if_legal(old_state, {
     old_state.active_block.position_x - 1,
     old_state.active_block.position_y,
-    old_state.active_block.tetrimino,
+    old_state.active_block.tetromino,
     old_state.active_block.rotation
   });
 }
@@ -90,7 +90,7 @@ GameState move_right(GameState old_state) {
   return update_active_block_if_legal(old_state, {
     old_state.active_block.position_x + 1,
     old_state.active_block.position_y,
-    old_state.active_block.tetrimino,
+    old_state.active_block.tetromino,
     old_state.active_block.rotation
   });
 }
@@ -99,7 +99,7 @@ GameState rotate_clockwise(GameState old_state) {
   return update_active_block_if_legal(old_state, {
     old_state.active_block.position_x,
     old_state.active_block.position_y,
-    old_state.active_block.tetrimino,
+    old_state.active_block.tetromino,
     rotate_clockwise(old_state.active_block.rotation)
   });
 }
@@ -108,7 +108,7 @@ GameState rotate_counterclockwise(GameState old_state) {
   return update_active_block_if_legal(old_state, {
     old_state.active_block.position_x,
     old_state.active_block.position_y,
-    old_state.active_block.tetrimino,
+    old_state.active_block.tetromino,
     rotate_counterclockwise(old_state.active_block.rotation)
   });
 }
@@ -144,7 +144,7 @@ bool operator==(const Field& lhs, const Field& rhs) {
 bool operator==(const ActiveBlock& lhs, const ActiveBlock& rhs) {
   return lhs.position_x == rhs.position_x
       && lhs.position_y == rhs.position_y
-      && lhs.tetrimino == rhs.tetrimino
+      && lhs.tetromino == rhs.tetromino
       && lhs.rotation == rhs.rotation;
 }
 

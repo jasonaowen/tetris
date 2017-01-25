@@ -7,20 +7,20 @@ enum class CellState {
   FILLED
 };
 
-enum class Tetrimino {
-  TETRIMINO_I, /* xxxx */
-  TETRIMINO_J, /* xxx
-                    x  */
-  TETRIMINO_L, /* xxx
-                  x    */
-  TETRIMINO_O, /*  xx
-                   xx  */
-  TETRIMINO_S, /*  xx
-                  xx   */
-  TETRIMINO_T, /* xxx
-                   x   */
-  TETRIMINO_Z  /* xx
-                   xx  */
+enum class Tetromino {
+  I, /* xxxx */
+  J, /* xxx
+          x  */
+  L, /* xxx
+        x    */
+  O, /*  xx
+         xx  */
+  S, /*  xx
+        xx   */
+  T, /* xxx
+         x   */
+  Z  /* xx
+         xx  */
 };
 
 enum class Rotation {
@@ -34,7 +34,7 @@ Rotation rotate_clockwise(Rotation);
 Rotation rotate_counterclockwise(Rotation);
 
 typedef std::vector<std::vector<CellState>> Shape;
-Shape get_shape(Tetrimino tetrimino, Rotation rotation);
+Shape get_shape(Tetromino tetromino, Rotation rotation);
 
 typedef std::vector<CellState> Line;
 
@@ -50,14 +50,14 @@ const int DEFAULT_HEIGHT = 20;
 struct ActiveBlock {
   int position_x; // position of left edge of block
   int position_y; // position of top edge of block
-  Tetrimino tetrimino;
+  Tetromino tetromino;
   Rotation rotation;
 };
 
 struct GameState {
   Field field;
   ActiveBlock active_block;
-  Tetrimino next_block;
+  Tetromino next_block;
   int milliseconds_per_turn;
   int score;
   int lines;
