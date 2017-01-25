@@ -146,3 +146,121 @@ TEST_CASE("Can move right fitting around previously dropped block", "[reducer]")
   CHECK(moved_right.active_block.position_x ==
         state.active_block.position_x + 1);
 }
+
+TEST_CASE("Can rotate clockwise", "[reducer]") {
+  GameState new_game, rotated;
+  new_game = reduce(new_game, Action::NEW_GAME);
+
+  rotated = reduce(new_game, Action::ROTATE_CLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::CLOCKWISE);
+
+  rotated = reduce(rotated, Action::ROTATE_CLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::UPSIDE_DOWN);
+
+  rotated = reduce(rotated, Action::ROTATE_CLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::COUNTERCLOCKWISE);
+
+  rotated = reduce(rotated, Action::ROTATE_CLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated == new_game);
+}
+
+TEST_CASE("Cannot rotate clockwise if surrounded", "[reducer]") {
+  const int initial_x = 5;
+  GameState state = default_game_with_active_block({
+    initial_x,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_I,
+    Rotation::CLOCKWISE
+  });
+  for (int y = 0; y < DEFAULT_HEIGHT; y++) {
+    for (int x = 0; x < DEFAULT_WIDTH; x++) {
+      if (x != initial_x) {
+        state.field.lines[y][x] = CellState::FILLED;
+      }
+    }
+  }
+
+  GameState rotated = reduce(state, Action::ROTATE_CLOCKWISE);
+
+  REQUIRE(rotated == state);
+}
+
+TEST_CASE("Cannot rotate clockwise if up against wall", "[reducer]") {
+  GameState state = default_game_with_active_block({
+    DEFAULT_WIDTH - 1,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_I,
+    Rotation::CLOCKWISE
+  });
+
+  GameState rotated = reduce(state, Action::ROTATE_CLOCKWISE);
+
+  REQUIRE(rotated == state);
+}
+
+TEST_CASE("Can rotate counterclockwise", "[reducer]") {
+  GameState new_game, rotated;
+  new_game = reduce(new_game, Action::NEW_GAME);
+
+  rotated = reduce(new_game, Action::ROTATE_COUNTERCLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::COUNTERCLOCKWISE);
+
+  rotated = reduce(rotated, Action::ROTATE_COUNTERCLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::UPSIDE_DOWN);
+
+  rotated = reduce(rotated, Action::ROTATE_COUNTERCLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated.active_block.rotation == Rotation::CLOCKWISE);
+
+  rotated = reduce(rotated, Action::ROTATE_COUNTERCLOCKWISE);
+
+  check_identical_except_active_block(rotated, new_game);
+  CHECK(rotated == new_game);
+}
+
+TEST_CASE("Cannot rotate counterclockwise if surrounded", "[reducer]") {
+  const int initial_x = 5;
+  GameState state = default_game_with_active_block({
+    initial_x,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_I,
+    Rotation::CLOCKWISE
+  });
+  for (int y = 0; y < DEFAULT_HEIGHT; y++) {
+    for (int x = 0; x < DEFAULT_WIDTH; x++) {
+      if (x != initial_x) {
+        state.field.lines[y][x] = CellState::FILLED;
+      }
+    }
+  }
+
+  GameState rotated = reduce(state, Action::ROTATE_COUNTERCLOCKWISE);
+
+  REQUIRE(rotated == state);
+}
+
+TEST_CASE("Cannot rotate counterclockwise if up against wall", "[reducer]") {
+  GameState state = default_game_with_active_block({
+    DEFAULT_WIDTH - 1,
+    DEFAULT_HEIGHT - 1,
+    Tetrimino::TETRIMINO_I,
+    Rotation::CLOCKWISE
+  });
+
+  GameState rotated = reduce(state, Action::ROTATE_COUNTERCLOCKWISE);
+
+  REQUIRE(rotated == state);
+}

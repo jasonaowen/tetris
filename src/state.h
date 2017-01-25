@@ -30,6 +30,9 @@ enum class Rotation {
   COUNTERCLOCKWISE
 };
 
+Rotation rotate_clockwise(Rotation);
+Rotation rotate_counterclockwise(Rotation);
+
 typedef std::vector<std::vector<CellState>> Shape;
 Shape get_shape(Tetrimino tetrimino, Rotation rotation);
 

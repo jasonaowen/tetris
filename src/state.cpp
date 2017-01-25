@@ -1,5 +1,23 @@
 #include "state.h"
 
+Rotation rotate_clockwise(Rotation rotation) {
+  switch(rotation) {
+    case Rotation::UNROTATED: return Rotation::CLOCKWISE;
+    case Rotation::CLOCKWISE: return Rotation::UPSIDE_DOWN;
+    case Rotation::UPSIDE_DOWN: return Rotation::COUNTERCLOCKWISE;
+    case Rotation::COUNTERCLOCKWISE: return Rotation::UNROTATED;
+  }
+}
+
+Rotation rotate_counterclockwise(Rotation rotation) {
+  switch(rotation) {
+    case Rotation::UNROTATED: return Rotation::COUNTERCLOCKWISE;
+    case Rotation::COUNTERCLOCKWISE: return Rotation::UPSIDE_DOWN;
+    case Rotation::UPSIDE_DOWN: return Rotation::CLOCKWISE;
+    case Rotation::CLOCKWISE: return Rotation::UNROTATED;
+  }
+}
+
 GameState new_game(int width, int height) {
   GameState state = {
     {
@@ -77,14 +95,41 @@ GameState move_right(GameState old_state) {
   });
 }
 
+GameState rotate_clockwise(GameState old_state) {
+  return update_active_block_if_legal(old_state, {
+    old_state.active_block.position_x,
+    old_state.active_block.position_y,
+    old_state.active_block.tetrimino,
+    rotate_clockwise(old_state.active_block.rotation)
+  });
+}
+
+GameState rotate_counterclockwise(GameState old_state) {
+  return update_active_block_if_legal(old_state, {
+    old_state.active_block.position_x,
+    old_state.active_block.position_y,
+    old_state.active_block.tetrimino,
+    rotate_counterclockwise(old_state.active_block.rotation)
+  });
+}
+
 GameState reduce(GameState state, Action action) {
   switch(action) {
     case Action::NEW_GAME:
       return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
     case Action::MOVE_LEFT:
       return move_left(state);
+
     case Action::MOVE_RIGHT:
       return move_right(state);
+
+    case Action::ROTATE_CLOCKWISE:
+      return rotate_clockwise(state);
+
+    case Action::ROTATE_COUNTERCLOCKWISE:
+      return rotate_counterclockwise(state);
+
     default:
       return state;
   }
