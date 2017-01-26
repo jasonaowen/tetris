@@ -10,4 +10,6 @@ This project uses CMake.
 $ mkdir build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
+$ make catch
+$ make && ./Test && ./Tetris
 ```
