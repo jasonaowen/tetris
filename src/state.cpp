@@ -60,8 +60,8 @@ bool is_legal_position(Field field, ActiveBlock active_block) {
   return true;
 }
 
-GameState update_active_block_if_legal(GameState state, ActiveBlock active_block) {
-  GameState new_state = {
+GameState update_active_block(GameState state, ActiveBlock active_block) {
+  return {
     state.field,
     active_block,
     state.next_block,
@@ -69,6 +69,10 @@ GameState update_active_block_if_legal(GameState state, ActiveBlock active_block
     state.score,
     state.lines
   };
+}
+
+GameState update_active_block_if_legal(GameState state, ActiveBlock active_block) {
+  GameState new_state = update_active_block(state, active_block);
 
   if (is_legal_position(new_state.field, new_state.active_block)) {
     return new_state;
@@ -113,16 +117,112 @@ GameState rotate_counterclockwise(GameState old_state) {
   });
 }
 
+Field add_block_to_field(Field field, ActiveBlock active_block) {
+  Field new_field = {
+    field.height,
+    field.width,
+    field.lines
+  };
+  Shape shape = get_shape(active_block.tetromino, active_block.rotation);
+  for (int shape_y = 0; shape_y < MAX_TETROMINO_HEIGHT; shape_y++) {
+    int field_y = active_block.position_y - shape_y;
+    for (int shape_x = 0; shape_x < MAX_TETROMINO_WIDTH; shape_x++) {
+      int field_x = active_block.position_x + shape_x;
+      if (shape[shape_y][shape_x] == CellState::FILLED) {
+        new_field.lines[field_y][field_x] = CellState::FILLED;
+      }
+    }
+  }
+  return new_field;
+}
+
+bool line_is_filled(Line line) {
+  for (CellState cell : line) {
+    if (cell == CellState::EMPTY) {
+      return false;
+    }
+  }
+  return true;
+}
+
+typedef std::pair<Field, int> FieldWithFilledLineCount;
+
+FieldWithFilledLineCount remove_filled_lines(Field field) {
+  int removed_lines = 0;
+  Field new_field = {
+    field.height,
+    field.width,
+    std::vector<Line>()
+  };
+  new_field.lines.reserve(field.height);
+  for (Line line : field.lines) {
+    if (line_is_filled(line)) {
+      removed_lines++;
+    } else {
+      new_field.lines.push_back(line);
+    }
+  }
+  new_field.lines.resize(field.height, std::vector<CellState>(field.width, CellState::EMPTY));
+  return FieldWithFilledLineCount(new_field, removed_lines);
+}
+
+ActiveBlock next_active_block(GameState state) {
+  return {
+    state.field.width / 2,
+    state.field.height - 1,
+    state.next_block,
+    Rotation::UNROTATED
+  };
+}
+
+int new_score(int old_score, int removed_lines) {
+  int removed_line_value = 100 * removed_lines;
+  if (removed_lines == MAX_TETROMINO_HEIGHT) {
+    removed_line_value *= 2;
+  }
+  return old_score + removed_line_value;
+}
+
+GameState move_down(GameState old_state) {
+  GameState moved = update_active_block(old_state, {
+    old_state.active_block.position_x,
+    old_state.active_block.position_y - 1,
+    old_state.active_block.tetromino,
+    old_state.active_block.rotation
+  });
+
+  if (is_legal_position(moved.field, moved.active_block)) {
+    return moved;
+  } else {
+    Field field = add_block_to_field(old_state.field, old_state.active_block);
+    FieldWithFilledLineCount fieldLines = remove_filled_lines(field);
+    return {
+      fieldLines.first,
+      next_active_block(old_state),
+      Tetromino::O, // someday we'll have randomness
+      old_state.milliseconds_per_turn,
+      new_score(old_state.score, fieldLines.second),
+      old_state.lines + fieldLines.second
+    };
+  }
+}
+
 GameState reduce(GameState state, Action action) {
   switch(action) {
     case Action::NEW_GAME:
       return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+    case Action::TIME_FALL:
+      return move_down(state);
 
     case Action::MOVE_LEFT:
       return move_left(state);
 
     case Action::MOVE_RIGHT:
       return move_right(state);
+
+    case Action::MOVE_DOWN:
+      return move_down(state);
 
     case Action::ROTATE_CLOCKWISE:
       return rotate_clockwise(state);

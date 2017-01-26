@@ -264,3 +264,75 @@ TEST_CASE("Cannot rotate counterclockwise if up against wall", "[reducer]") {
 
   REQUIRE(rotated == state);
 }
+
+TEST_CASE("Can move down", "[reducer]") {
+  GameState new_game, moved;
+  new_game = reduce(new_game, Action::NEW_GAME);
+
+  moved = reduce(new_game, Action::MOVE_DOWN);
+
+  check_identical_except_active_block(moved, new_game);
+  CHECK(moved.active_block.position_x == new_game.active_block.position_x);
+  CHECK(moved.active_block.position_y == new_game.active_block.position_y - 1);
+  CHECK(moved.active_block.tetromino == new_game.active_block.tetromino);
+  CHECK(moved.active_block.rotation == new_game.active_block.rotation);
+}
+
+
+TEST_CASE("Can fall down", "[reducer]") {
+  GameState new_game, moved;
+  new_game = reduce(new_game, Action::NEW_GAME);
+
+  moved = reduce(new_game, Action::TIME_FALL);
+
+  check_identical_except_active_block(moved, new_game);
+  CHECK(moved.active_block.position_x == new_game.active_block.position_x);
+  CHECK(moved.active_block.position_y == new_game.active_block.position_y - 1);
+  CHECK(moved.active_block.tetromino == new_game.active_block.tetromino);
+  CHECK(moved.active_block.rotation == new_game.active_block.rotation);
+}
+
+TEST_CASE("Can move down to deposit block", "[reducer]") {
+  GameState state = default_game_with_active_block({
+    0,
+    0,
+    Tetromino::I,
+    Rotation::UNROTATED
+  });
+
+  GameState moved = reduce(state, Action::MOVE_DOWN);
+
+  CHECK(moved.field.lines[0][0] == CellState::FILLED);
+  CHECK(moved.field.lines[0][1] == CellState::FILLED);
+  CHECK(moved.field.lines[0][2] == CellState::FILLED);
+  CHECK(moved.field.lines[0][3] == CellState::FILLED);
+  CHECK(moved.field.lines[0][4] == CellState::EMPTY);
+}
+
+TEST_CASE("Can fall down to complete line", "[reducer]") {
+  GameState state = default_game_with_active_block({
+    0,
+    0,
+    Tetromino::I,
+    Rotation::UNROTATED
+  });
+  for (int x = 4; x < DEFAULT_WIDTH; x++) {
+    state.field.lines[0][x] = CellState::FILLED;
+  }
+
+  GameState moved = reduce(state, Action::TIME_FALL);
+
+  GameState expected = default_game_with_active_block({
+    DEFAULT_WIDTH / 2,
+    DEFAULT_HEIGHT - 1,
+    state.next_block,
+    Rotation::UNROTATED
+  });
+
+  CHECK(moved.field == expected.field); // empty field
+  for (int x = 0; x < DEFAULT_WIDTH; x++) {
+    CHECK(moved.field.lines[0][x] == CellState::EMPTY);
+  }
+  CHECK(moved.active_block == expected.active_block);
+  CHECK(moved.lines == 1);
+}

@@ -7,6 +7,9 @@ enum class CellState {
   FILLED
 };
 
+const int MAX_TETROMINO_WIDTH = 4;
+const int MAX_TETROMINO_HEIGHT = 4;
+
 enum class Tetromino {
   I, /* xxxx */
   J, /* xxx

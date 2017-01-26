@@ -136,9 +136,9 @@ Shape parse_block(Tetromino tetromino, Rotation rotation) {
     {CellState::EMPTY, CellState::EMPTY, CellState::EMPTY, CellState::EMPTY},
     {CellState::EMPTY, CellState::EMPTY, CellState::EMPTY, CellState::EMPTY}
   };
-  for (int y = 0; y < 3; y++) {
-    for (int x = 0; x < 3; x++) {
-      if (block[4 * y + x] == '*') {
+  for (int y = 0; y < MAX_TETROMINO_HEIGHT; y++) {
+    for (int x = 0; x < MAX_TETROMINO_WIDTH; x++) {
+      if (block[y * MAX_TETROMINO_HEIGHT + x] == '*') {
         shape[y][x] = CellState::FILLED;
       }
     }
