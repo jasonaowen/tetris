@@ -18,6 +18,21 @@ Rotation rotate_counterclockwise(Rotation rotation) {
   }
 }
 
+const char* get_action_name(Action action) {
+  switch (action) {
+  case Action::NO_ACTION:               return "NO_ACTION";
+  case Action::QUIT:                    return "QUIT";
+  case Action::NEW_GAME:                return "NEW_GAME";
+  case Action::TIME_FALL:               return "TIME_FALL";
+  case Action::MOVE_LEFT:               return "MOVE_LEFT";
+  case Action::MOVE_RIGHT:              return "MOVE_RIGHT";
+  case Action::MOVE_DOWN:               return "MOVE_DOWN";
+  case Action::ROTATE_CLOCKWISE:        return "ROTATE_CLOCKWISE";
+  case Action::ROTATE_COUNTERCLOCKWISE: return "ROTATE_COUNTERCLOCKWISE";
+  default:                              return "Unknown";
+  }
+}
+
 GameState new_game(int width, int height) {
   GameState state = {
     {

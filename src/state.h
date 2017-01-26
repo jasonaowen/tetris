@@ -67,6 +67,8 @@ struct GameState {
 };
 
 enum class Action {
+  NO_ACTION,
+  QUIT,
   NEW_GAME,
   TIME_FALL,
   MOVE_LEFT,
@@ -75,6 +77,8 @@ enum class Action {
   ROTATE_CLOCKWISE,
   ROTATE_COUNTERCLOCKWISE
 };
+
+const char* get_action_name(Action);
 
 GameState reduce(GameState state, Action action);
 bool operator==(const Field& lhs, const Field& rhs);
