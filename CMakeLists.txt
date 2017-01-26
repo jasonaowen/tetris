@@ -14,6 +14,11 @@ target_compile_features (Test PRIVATE cxx_generalized_initializers
                                       cxx_range_for
                                       cxx_strong_enums)
 
+INCLUDE(FindPkgConfig)
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES})
+
 include (ExternalProject)
 find_package (Git REQUIRED)
 ExternalProject_ADD (
