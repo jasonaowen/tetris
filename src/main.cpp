@@ -52,6 +52,46 @@ int calculate_cell_size(GameState state, int view_width, int view_height) {
   }
 }
 
+void render_field(SDL_Renderer *renderer, Field field, int cell_size) {
+  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  for (int field_y = 0; field_y < field.height; field_y++) {
+    for (int field_x = 0; field_x < field.width; field_x++) {
+      if (field.lines[field_y][field_x] == CellState::FILLED) {
+        SDL_Rect rect = {
+          cell_size * field_x,
+          cell_size * ((field.height - 1) - field_y),
+          cell_size,
+          cell_size
+        };
+        SDL_RenderFillRect(renderer, &rect);
+      }
+    }
+  }
+}
+
+void render_active_block(SDL_Renderer *renderer,
+                         ActiveBlock active_block,
+                         int field_height,
+                         int cell_size) {
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0xFF, 0xFF);
+  Shape shape = get_shape(active_block.tetromino, active_block.rotation);
+  for (int shape_y = 0; shape_y < MAX_TETROMINO_HEIGHT; shape_y++) {
+    for (int shape_x = 0; shape_x < MAX_TETROMINO_WIDTH; shape_x++) {
+      if (shape[shape_y][shape_x] == CellState::FILLED) {
+        int field_x = active_block.position_x + shape_x;
+        int field_y = active_block.position_y - shape_y;
+        SDL_Rect rect = {
+          cell_size * field_x,
+          cell_size * (field_height - 1 - field_y),
+          cell_size,
+          cell_size
+        };
+        SDL_RenderFillRect(renderer, &rect);
+      }
+    }
+  }
+}
+
 void render(SDL_Renderer *renderer, GameState state) {
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
@@ -60,41 +100,17 @@ void render(SDL_Renderer *renderer, GameState state) {
   SDL_RenderClear(renderer);
 
   int cell_size = calculate_cell_size(state, width, height);
-  int field_left = (width - (cell_size * state.field.width)) / 2;
-  int field_top = (height - (cell_size * state.field.height)) / 2;
+  SDL_Rect field = {
+    (width - (cell_size * state.field.width)) / 2,
+    (height - (cell_size * state.field.height)) / 2,
+    cell_size * state.field.width,
+    cell_size * state.field.height
+  };
+  SDL_RenderSetViewport(renderer, &field);
 
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-  for (int field_y = 0; field_y < state.field.height; field_y++) {
-    for (int field_x = 0; field_x < state.field.width; field_x++) {
-      if (state.field.lines[field_y][field_x] == CellState::FILLED) {
-        SDL_Rect rect = {
-          field_left + cell_size * field_x,
-          field_top + cell_size * ((state.field.height - 1) - field_y),
-          cell_size,
-          cell_size
-        };
-        SDL_RenderFillRect(renderer, &rect);
-      }
-    }
-  }
+  render_field(renderer, state.field, cell_size);
+  render_active_block(renderer, state.active_block, state.field.height, cell_size);
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0xFF, 0xFF);
-  Shape shape = get_shape(state.active_block.tetromino, state.active_block.rotation);
-  for (int shape_y = 0; shape_y < MAX_TETROMINO_HEIGHT; shape_y++) {
-    for (int shape_x = 0; shape_x < MAX_TETROMINO_WIDTH; shape_x++) {
-      if (shape[shape_y][shape_x] == CellState::FILLED) {
-        int field_x = state.active_block.position_x + shape_x;
-        int field_y = state.active_block.position_y - shape_y;
-        SDL_Rect rect = {
-          field_left + cell_size * field_x,
-          field_top + cell_size * (state.field.height - 1 - field_y),
-          cell_size,
-          cell_size
-        };
-        SDL_RenderFillRect(renderer, &rect);
-      }
-    }
-  }
 
   SDL_RenderPresent(renderer);
 }
