@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "state.h"
 
 Rotation rotate_clockwise(Rotation rotation) {
@@ -152,12 +154,10 @@ Field add_block_to_field(Field field, ActiveBlock active_block) {
 }
 
 bool line_is_filled(Line line) {
-  for (CellState cell : line) {
-    if (cell == CellState::EMPTY) {
-      return false;
-    }
-  }
-  return true;
+  return std::all_of(
+    line.begin(),
+    line.end(),
+    [](CellState cell){ return cell == CellState::FILLED; });
 }
 
 typedef std::pair<Field, int> FieldWithFilledLineCount;
