@@ -124,13 +124,57 @@ Uint32 timer_callback(Uint32 interval, void *param) {
   return interval;
 }
 
+struct UIGameState {
+  GameState game_state;
+  SDL_TimerID timer_id;
+};
+
+UIGameState ui_reduce(UIGameState state, Action action) {
+  GameState new_game_state = reduce(state.game_state, action);
+  switch (action) {
+  case Action::NEW_GAME:
+  case Action::MOVE_DOWN:
+    SDL_RemoveTimer(state.timer_id);
+    return {
+      new_game_state,
+      SDL_AddTimer(
+        new_game_state.milliseconds_per_turn,
+        timer_callback,
+        nullptr
+      )
+    };
+  case Action::TIME_FALL:
+    if (state.game_state.milliseconds_per_turn !=
+        new_game_state.milliseconds_per_turn) {
+      SDL_RemoveTimer(state.timer_id);
+      return {
+        new_game_state,
+        SDL_AddTimer(
+          new_game_state.milliseconds_per_turn,
+          timer_callback,
+          nullptr
+        )
+      };
+    } else {
+      return {
+        new_game_state,
+        state.timer_id
+      };
+    }
+  default:
+    return {
+      new_game_state,
+      state.timer_id
+    };
+  }
+}
+
 void game_loop(SDL_Renderer *renderer) {
-  GameState state;
-  state = reduce(state, Action::NEW_GAME);
-  SDL_TimerID timer_id = SDL_AddTimer(
-    state.milliseconds_per_turn,
-    timer_callback,
-    nullptr
+  UIGameState state = ui_reduce({
+      {},
+      0
+    },
+    Action::NEW_GAME
   );
 
   bool should_quit = false;
@@ -150,9 +194,9 @@ void game_loop(SDL_Renderer *renderer) {
       get_action_name(action)
     );
 
-    state = reduce(state, action);
+    state = ui_reduce(state, action);
 
-    render(renderer, state);
+    render(renderer, state.game_state);
   }
 }
 

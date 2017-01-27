@@ -27,8 +27,7 @@ GameState default_game_with_active_block(ActiveBlock active_block) {
 }
 
 TEST_CASE("Can create new game", "[reducer]") {
-  GameState state;
-  state = reduce(state, Action::NEW_GAME);
+  GameState state = reduce({}, Action::NEW_GAME);
   CHECK(state.field.height == DEFAULT_HEIGHT);
   CHECK(state.field.lines.size() == DEFAULT_HEIGHT);
   CHECK(state.field.width == DEFAULT_WIDTH);
