@@ -8,6 +8,7 @@ void check_identical_except_active_block(GameState lhs, GameState rhs) {
   CHECK(lhs.milliseconds_per_turn == rhs.milliseconds_per_turn);
   CHECK(lhs.score == rhs.score);
   CHECK(lhs.lines == rhs.lines);
+  CHECK(lhs.progress == rhs.progress);
 }
 
 GameState default_game_with_active_block(ActiveBlock active_block) {
@@ -22,7 +23,8 @@ GameState default_game_with_active_block(ActiveBlock active_block) {
     Tetromino::T,
     1000,
     0,
-    0
+    0,
+    GameProgress::IN_PROGRESS
   };
 }
 
@@ -334,4 +336,25 @@ TEST_CASE("Can fall down to complete line", "[reducer]") {
   }
   CHECK(moved.active_block == expected.active_block);
   CHECK(moved.lines == 1);
+}
+
+TEST_CASE("New game starts out in progres", "[reducer]") {
+  GameState state = reduce({}, Action::NEW_GAME);
+
+  REQUIRE(state.progress == GameProgress::IN_PROGRESS);
+}
+
+TEST_CASE("Game ends when new piece is blocked", "[reducer]") {
+  // All but the last line and last column is full
+  GameState state = reduce({}, Action::NEW_GAME);
+  state.active_block.tetromino = Tetromino::I;
+  for (int y = 0; y < state.field.height - 1; y++) {
+    for (int x = 0; x < state.field.width - 1; x++) {
+      state.field.lines[y][x] = CellState::FILLED;
+    }
+  }
+
+  state = reduce(state, Action::TIME_FALL);
+
+  REQUIRE(state.progress == GameProgress::GAME_OVER);
 }

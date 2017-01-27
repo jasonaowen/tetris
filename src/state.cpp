@@ -51,7 +51,8 @@ GameState new_game(int width, int height) {
     Tetromino::T,
     1000,
     0,
-    0
+    0,
+    GameProgress::IN_PROGRESS
   };
 
   return state;
@@ -84,7 +85,8 @@ GameState update_active_block(GameState state, ActiveBlock active_block) {
     state.next_block,
     state.milliseconds_per_turn,
     state.score,
-    state.lines
+    state.lines,
+    state.progress
   };
 }
 
@@ -211,18 +213,24 @@ GameState move_down(GameState old_state) {
   } else {
     Field field = add_block_to_field(old_state.field, old_state.active_block);
     FieldWithFilledLineCount fieldLines = remove_filled_lines(field);
+    ActiveBlock active_block = next_active_block(old_state);
     return {
       fieldLines.first,
-      next_active_block(old_state),
+      active_block,
       Tetromino::O, // someday we'll have randomness
       old_state.milliseconds_per_turn,
       new_score(old_state.score, fieldLines.second),
-      old_state.lines + fieldLines.second
+      old_state.lines + fieldLines.second,
+      is_legal_position(fieldLines.first, active_block)?
+        GameProgress::IN_PROGRESS : GameProgress::GAME_OVER
     };
   }
 }
 
 GameState reduce(GameState state, Action action) {
+  if (state.progress == GameProgress::GAME_OVER && action != Action::NEW_GAME) {
+    return state;
+  }
   switch(action) {
     case Action::NEW_GAME:
       return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);

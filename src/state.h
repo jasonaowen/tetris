@@ -57,6 +57,11 @@ struct ActiveBlock {
   Rotation rotation;
 };
 
+enum class GameProgress {
+  IN_PROGRESS,
+  GAME_OVER
+};
+
 struct GameState {
   Field field;
   ActiveBlock active_block;
@@ -64,6 +69,7 @@ struct GameState {
   int milliseconds_per_turn;
   int score;
   int lines;
+  GameProgress progress;
 };
 
 enum class Action {
