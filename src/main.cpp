@@ -115,9 +115,23 @@ void render(SDL_Renderer *renderer, GameState state) {
   SDL_RenderPresent(renderer);
 }
 
+Uint32 timer_callback(Uint32 interval, void *param) {
+  SDL_Event event;
+  SDL_zero(event);
+  event.type = SDL_USEREVENT;
+  SDL_PushEvent(&event);
+
+  return interval;
+}
+
 void game_loop(SDL_Renderer *renderer) {
   GameState state;
   state = reduce(state, Action::NEW_GAME);
+  SDL_TimerID timer_id = SDL_AddTimer(
+    state.milliseconds_per_turn,
+    timer_callback,
+    nullptr
+  );
 
   bool should_quit = false;
   SDL_Event event;
