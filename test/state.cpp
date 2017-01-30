@@ -338,7 +338,7 @@ TEST_CASE("Can fall down to complete line", "[reducer]") {
   CHECK(moved.lines == 1);
 }
 
-TEST_CASE("New game starts out in progres", "[reducer]") {
+TEST_CASE("New game starts out in progress", "[reducer]") {
   GameState state = reduce({}, Action::NEW_GAME);
 
   REQUIRE(state.progress == GameProgress::IN_PROGRESS);
