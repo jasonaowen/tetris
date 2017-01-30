@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include <vector>
 
 enum class CellState {
@@ -25,6 +26,7 @@ enum class Tetromino {
   Z  /* xx
          xx  */
 };
+const int TETROMINO_COUNT = 7;
 
 enum class Rotation {
   UNROTATED,
@@ -62,6 +64,8 @@ enum class GameProgress {
   GAME_OVER
 };
 
+typedef std::mt19937 RNG;
+
 struct GameState {
   Field field;
   ActiveBlock active_block;
@@ -70,6 +74,7 @@ struct GameState {
   int score;
   int lines;
   GameProgress progress;
+  RNG rng;
 };
 
 enum class Action {

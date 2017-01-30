@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 
 #include "state.h"
 
@@ -35,7 +36,14 @@ const char* get_action_name(Action action) {
   }
 }
 
-GameState new_game(int width, int height) {
+Tetromino next_random_block(RNG &rng) {
+  auto dist = std::uniform_int_distribution<int>(0, TETROMINO_COUNT - 1);
+  int random_number = dist(rng);
+  return static_cast<Tetromino>(random_number);
+}
+
+GameState new_game(int width, int height, RNG::result_type seed) {
+  RNG rng = RNG(seed);
   GameState state = {
     {
       height,
@@ -45,14 +53,15 @@ GameState new_game(int width, int height) {
     {
       width / 2,
       height - 1,
-      Tetromino::O,
+      next_random_block(rng),
       Rotation::UNROTATED
     },
-    Tetromino::T,
+    next_random_block(rng),
     1000,
     0,
     0,
-    GameProgress::IN_PROGRESS
+    GameProgress::IN_PROGRESS,
+    rng
   };
 
   return state;
@@ -86,7 +95,8 @@ GameState update_active_block(GameState state, ActiveBlock active_block) {
     state.milliseconds_per_turn,
     state.score,
     state.lines,
-    state.progress
+    state.progress,
+    state.rng
   };
 }
 
@@ -214,15 +224,18 @@ GameState move_down(GameState old_state) {
     Field field = add_block_to_field(old_state.field, old_state.active_block);
     FieldWithFilledLineCount fieldLines = remove_filled_lines(field);
     ActiveBlock active_block = next_active_block(old_state);
+    RNG rng = old_state.rng;
+    Tetromino next_block = next_random_block(rng);
     return {
       fieldLines.first,
       active_block,
-      Tetromino::O, // someday we'll have randomness
+      next_block,
       old_state.milliseconds_per_turn,
       new_score(old_state.score, fieldLines.second),
       old_state.lines + fieldLines.second,
       is_legal_position(fieldLines.first, active_block)?
-        GameProgress::IN_PROGRESS : GameProgress::GAME_OVER
+        GameProgress::IN_PROGRESS : GameProgress::GAME_OVER,
+      rng
     };
   }
 }
@@ -233,7 +246,11 @@ GameState reduce(GameState state, Action action) {
   }
   switch(action) {
     case Action::NEW_GAME:
-      return new_game(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+      return new_game(
+        DEFAULT_WIDTH,
+        DEFAULT_HEIGHT,
+        std::chrono::system_clock::now().time_since_epoch().count()
+      );
 
     case Action::TIME_FALL:
       return move_down(state);

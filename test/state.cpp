@@ -24,7 +24,8 @@ GameState default_game_with_active_block(ActiveBlock active_block) {
     1000,
     0,
     0,
-    GameProgress::IN_PROGRESS
+    GameProgress::IN_PROGRESS,
+    RNG(0)
   };
 }
 
@@ -357,4 +358,53 @@ TEST_CASE("Game ends when new piece is blocked", "[reducer]") {
   state = reduce(state, Action::TIME_FALL);
 
   REQUIRE(state.progress == GameProgress::GAME_OVER);
+}
+
+TEST_CASE("Random number sequence of seed 0", "[exploratory]") {
+  RNG rng = RNG(0);
+  std::uniform_int_distribution<int> distribution(0, TETROMINO_COUNT - 1);
+
+  CHECK(distribution(rng) == 3);
+  CHECK(distribution(rng) == 4);
+  CHECK(distribution(rng) == 5);
+  CHECK(distribution(rng) == 5);
+  CHECK(distribution(rng) == 4);
+  CHECK(distribution(rng) == 6);
+  CHECK(distribution(rng) == 3);
+  CHECK(distribution(rng) == 5);
+}
+
+GameState fall_until_new_block(GameState original) {
+  GameState next = original;
+  while (original.field == next.field) {
+    next = reduce(next, Action::TIME_FALL);
+  }
+  return next;
+}
+
+TEST_CASE("Next block is chosen randomly (and stably)", "[reducer]") {
+  GameState prev = default_game_with_active_block({
+    0,
+    0,
+    Tetromino::I,
+    Rotation::UNROTATED
+  });
+
+  GameState next = fall_until_new_block(prev);
+  CHECK(next.next_block == Tetromino::O);
+
+  next = fall_until_new_block(next);
+  CHECK(next.next_block == Tetromino::S);
+
+  next = fall_until_new_block(next);
+  CHECK(next.next_block == Tetromino::T);
+
+  next = fall_until_new_block(next);
+  CHECK(next.next_block == Tetromino::T);
+
+  next = fall_until_new_block(next);
+  CHECK(next.next_block == Tetromino::S);
+
+  next = fall_until_new_block(next);
+  CHECK(next.next_block == Tetromino::Z);
 }
