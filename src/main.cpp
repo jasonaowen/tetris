@@ -96,7 +96,8 @@ void render(SDL_Renderer *renderer, GameState state) {
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
 
-  SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x10, 0xFF);
+  SDL_RenderSetViewport(renderer, NULL);
+  SDL_SetRenderDrawColor(renderer, 0x40, 0x40, 0x40, 0xFF);
   SDL_RenderClear(renderer);
 
   int cell_size = calculate_cell_size(state, width, height);
@@ -107,6 +108,8 @@ void render(SDL_Renderer *renderer, GameState state) {
     cell_size * state.field.height
   };
   SDL_RenderSetViewport(renderer, &field);
+  SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x10, 0xFF);
+  SDL_RenderFillRect(renderer, NULL);
 
   render_field(renderer, state.field, cell_size);
   render_active_block(renderer, state.active_block, state.field.height, cell_size);
