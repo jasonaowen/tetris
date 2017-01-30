@@ -92,6 +92,31 @@ void render_active_block(SDL_Renderer *renderer,
   }
 }
 
+void render_next_block(SDL_Renderer *renderer,
+                       SDL_Rect next_block_view,
+                       int cell_size,
+                       Tetromino next_block) {
+  SDL_RenderSetViewport(renderer, &next_block_view);
+  SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x10, 0xFF);
+  SDL_RenderFillRect(renderer, NULL);
+
+  SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0xFF);
+  Shape shape = get_shape(next_block, Rotation::UNROTATED);
+  for (int shape_y = 0; shape_y < MAX_TETROMINO_HEIGHT; shape_y++) {
+    for (int shape_x = 0; shape_x < MAX_TETROMINO_WIDTH; shape_x++) {
+      if (shape[shape_y][shape_x] == CellState::FILLED) {
+        SDL_Rect rect = {
+          cell_size * shape_x,
+          cell_size * shape_y,
+          cell_size,
+          cell_size
+        };
+        SDL_RenderFillRect(renderer, &rect);
+      }
+    }
+  }
+}
+
 void render(SDL_Renderer *renderer, GameState state) {
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
@@ -114,6 +139,13 @@ void render(SDL_Renderer *renderer, GameState state) {
   render_field(renderer, state.field, cell_size);
   render_active_block(renderer, state.active_block, state.field.height, cell_size);
 
+  SDL_Rect next_block = {
+    field.x + field.w + 10,
+    10,
+    cell_size * MAX_TETROMINO_WIDTH,
+    cell_size * MAX_TETROMINO_HEIGHT
+  };
+  render_next_block(renderer, next_block, cell_size, state.next_block);
 
   SDL_RenderPresent(renderer);
 }
