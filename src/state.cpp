@@ -60,8 +60,8 @@ GameState new_game(int width, int height) {
 
 bool is_legal_position(Field field, ActiveBlock active_block) {
   Shape shape = get_shape(active_block.tetromino, active_block.rotation);
-  for (int shape_y = 0; shape_y < 3; shape_y++) {
-    for (int shape_x = 0; shape_x < 3; shape_x++) {
+  for (int shape_y = 0; shape_y < MAX_TETROMINO_HEIGHT; shape_y++) {
+    for (int shape_x = 0; shape_x < MAX_TETROMINO_WIDTH; shape_x++) {
       if (shape[shape_y][shape_x] == CellState::FILLED) {
         int field_x = active_block.position_x + shape_x;
         int field_y = active_block.position_y - shape_y; // start at top of shape and work down
